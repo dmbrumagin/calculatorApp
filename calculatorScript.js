@@ -1,90 +1,38 @@
- /*------------------------------VARIABLES---------------------------------*/
-    const result = document.getElementById("result");
-    const clear = document.getElementById("clear");
-    const clearNumber = document.getElementById("clearNumber");
-    const back = document.getElementById("back");
-    const equals = document.getElementById("equals");
-    const neg = document.getElementById("negative");
-    const operators = document.querySelectorAll("#operator");
-    const numbers = document.querySelectorAll("#number");
-    const historyElement = document.getElementById("history");
-    const historyArray = [];
+/*------------------------------VARIABLES---------------------------------*/
+const result = document.getElementById("result");
+const clear = document.getElementById("clear");
+const clearNumber = document.getElementById("clearNumber");
+const back = document.getElementById("back");
+const equals = document.getElementById("equals");
+const neg = document.getElementById("negative");
+const operators = document.querySelectorAll("#operator");
+const numbers = document.querySelectorAll("#number");
+const historyElement = document.getElementById("history");
+const historyArray = [];
 
-    let historyStatement = "";
-    let number = "";
-    let answer = null;
-    let operator = "";
+let historyStatement = "";
+let number = "";
+let answer = null;
+let operator = "";
+let currentlyOperating = false;
 
-    /*-------------------------EVENT LISTENERS--------------------------------*/   
-    
-    clear.addEventListener("click", clearEvent);    
-    clearNumber.addEventListener("click", clearNumberEvent);    
-    back.addEventListener("click", backEvent);    
-    equals.addEventListener("click", displayAnswer);    
-    neg.addEventListener("click",negativeNumber);    
-    operators.forEach(n => n.addEventListener("click", storeOperator));    
-    numbers.forEach(n => n.addEventListener("click", formNumber));
+/*-------------------------EVENT LISTENERS--------------------------------*/   
 
-    /*-----------------------------FUNCTIONS----------------------------------*/
+clear.addEventListener("click", clearEvent);    
+clearNumber.addEventListener("click", clearNumberEvent);    
+back.addEventListener("click", backEvent);    
+equals.addEventListener("click", displayAnswer);    
+neg.addEventListener("click",negativeNumber);    
+operators.forEach(n => n.addEventListener("click", storeOperator));    
+numbers.forEach(n => n.addEventListener("click", formNumber));
 
-    function storeOperator() {        
-        if (answer === null) 
-            answer = Number.parseFloat(number);        
-        else if (number) {
-            switch (operator) {
-                case "*": answer *= Number.parseFloat(number);
-                    break;
-                case "/": answer /= Number.parseFloat(number);
-                    break;
-                case "-": answer -= Number.parseFloat(number);
-                    break;
-                case "+": answer += Number.parseFloat(number);
-                    break;
-            }
-        }
-        operator = event.target.innerHTML;
-        result.innerText = operator;
-        historyStatement += `${number} ${operator}`;
-        number = "";
-    }
+/*-----------------------------FUNCTIONS----------------------------------*/
 
-    function formNumber(event) {
-        number += event.target.innerHTML;
-        result.innerText = number;
-    }
-
-    function negativeNumber(){
-        if(number.charAt(0)!='-')
-            number = `-${number}`;
-        else{
-            number = number.slice(1,number.length);
-        }
-        result.innerText = number;
-    }
-
-    function calculate() {const result = document.getElementById("result");}
-
-    function clearEvent() {
-        answer = null;
-        historyStatement = "";
-        number = "";
-        operator = "";
-        result.innerText ="";
-    }
-
-    function clearNumberEvent() {
-        number = "";
-        result.innerText = number;
-    }
-
-    function updateDisplayAnswer() {result.innerText = Number.parseFloat(answer);}
-
-    function backEvent() {
-        number = number.slice(0, number.length - 1);
-        result.innerText = number;
-    }
-
-    function displayAnswer() {
+function storeOperator() {        
+    currentlyOperating=false;
+    if (answer === null) 
+        answer = Number.parseFloat(number);        
+    else if (number) {
         switch (operator) {
             case "*": answer *= Number.parseFloat(number);
                 break;
@@ -95,24 +43,88 @@
             case "+": answer += Number.parseFloat(number);
                 break;
         }
-        if(answer!= null && !Number.isNaN(answer)){
-            historyStatement += ` ${number} = ${answer}`;
-            historyArray.push(historyStatement);
-            updateDisplayAnswer();
-        }
+    }
+    operator = event.target.innerHTML;
+    result.innerText = operator;
+    historyStatement += `${number} ${operator}`;
+    number = "";
+}
 
-        else{
-            result.innerText = "error";
-        }
+function formNumber(event) {   
+    if(currentlyOperating===false){
+        number += event.target.innerHTML;
+        result.innerText = number;
+    }  
+    else{
+        currentlyOperating= false; 
+        clearEvent();
+        number += event.target.innerHTML;
+        result.innerText = number;
+    }
+}
 
-        displayHistory();        
-        historyStatement = "";
-        number = "";
-        operator = "";        
-        answer = null;
+function negativeNumber(){
+    if(number.charAt(0)!='-')
+        number = `-${number}`;
+    else{
+        number = number.slice(1,number.length);
+    }
+    result.innerText = number;
+}
+
+function calculate() {const result = document.getElementById("result");}
+
+function clearEvent() {
+    answer = null;
+    historyStatement = "";
+    number = "";
+    operator = "";
+    result.innerText ="";
+}
+
+function clearNumberEvent() {
+    number = "";
+    result.innerText = number;
+}
+
+function updateDisplayAnswer() {result.innerText = Number.parseFloat(answer);}
+
+function backEvent() {
+    number = number.slice(0, number.length - 1);
+    result.innerText = number;
+}
+
+function displayAnswer() {
+    currentlyOperating = true;
+    switch (operator) {
+        case "*": answer *= Number.parseFloat(number);
+            break;
+        case "/": answer /= Number.parseFloat(number);
+            break;
+        case "-": answer -= Number.parseFloat(number);
+            break;
+        case "+": answer += Number.parseFloat(number);
+            break;
+    }
+    if(answer!= null && !Number.isNaN(answer)){
+      
+        historyStatement += ` ${number} = ${answer}`;
+        historyArray.push(historyStatement);
+        updateDisplayAnswer();
     }
 
-    function displayHistory() {
-        const html = historyArray.map(n => `<li>${n}</li>`).join("");
-        historyElement.innerHTML = html;
+    else{
+        result.innerText = "error";
     }
+
+    displayHistory();       
+    if(answer) 
+        historyStatement = `${answer}`;
+    number = "";
+    operator = "";        
+}
+
+function displayHistory() {
+    const html = historyArray.map(n => `<li>${n}</li>`).join("");
+    historyElement.innerHTML = html;
+}
