@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quantico&display=swap" rel="stylesheet">
+    <style>
+        div:first-of-type {
+            width: 500px;
+            display: flex;
+            justify-content: center;
+            flex-direction: row;
+            flex-wrap: wrap;
+            background: linear-gradient(to bottom right, #999, #222);            
+            padding: 20px;
+            border: 3px rgb(#555);
+            border-style: outset;
+        }
+        div#main {
+            width: 506px;
+            padding: 20px;
+            background-color: rgb(255, 255, 247);
+            box-shadow: 5px 5px 10px rgb(133, 133, 133) inset;
+            border: 3px rgb(#555);
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        div div:hover {
+            background-color: #EEE;
+        }
+        div div:active {
+            background-color: #FFF;
+        }
+        #operator:hover {
+            background: rgb(250, 196, 196);
+        }
+        #operator:active {
+            background: rgb(255, 232, 232);
+        }
+        #number:hover {
+            background: #EEE;
+        }
+        #number:active {
+            background: #FFF;
+        }
+        div div {
+            width: 80px;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 5px;
+            background: #999;
+            font-family:Verdana, Geneva, Tahoma, sans-serif;
+            box-shadow: 5px 5px 10px #222, 3px 3px 2px #DDD inset;
+        }
+        #result {
+            width: 400px;
+            height: 2vh;
+            color: rgb(255, 255, 226);
+            background-color: black;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 5px;
+            box-shadow: 5px 5px 10px #222, 3px 3px 2px #DDD inset;
+            font-family: 'Quantico', sans-serif;
+        }
+        #operator {
+            background: rgb(255, 163, 163);
+        }
+        #number {
+            background: #DDD;
+            box-shadow: 5px 5px 10px #222, 3px 3px 2px #FFF inset;
+        }
+    </style>
+    <title>Calculator</title>
+</head>
+<body>
+    <div>
+        <div id="result">---</div>
+        <div id="clear">CE</div>
+        <div id="clearNumber">C</div>
+        <div id="back">&lt;&lt;</div>
+        <div id="operator">/</div>        
+        <div id="number">7</div>
+        <div id="number">8</div>
+        <div id="number">9</div>
+        <div id="operator">*</div>        
+        <div id="number">4</div>
+        <div id="number">5</div>
+        <div id="number">6</div>
+        <div id="operator">-</div>        
+        <div id="number">1</div>
+        <div id="number">2</div>
+        <div id="number">3</div>
+        <div id="operator">+</div>        
+        <div id="negative">(-/+)</div>
+        <div id="number">0</div>
+        <div id="number">.</div>
+        <div id="equals">=</div>       
+    </div>
+    <div id="main">        
+        <fieldset>
+            <legend>History</legend>
+            <ul id="history"></ul>
+        </fieldset>
+    </div>
+</body>
+<script>   
+
+    /*------------------------------VARIABLES---------------------------------*/
+    const result = document.getElementById("result");
+    const clear = document.getElementById("clear");
+    const clearNumber = document.getElementById("clearNumber");
+    const back = document.getElementById("back");
+    const equals = document.getElementById("equals");
+    const neg = document.getElementById("negative");
+    const operators = document.querySelectorAll("#operator");
+    const numbers = document.querySelectorAll("#number");
+    const historyElement = document.getElementById("history");
+    const historyArray = [];
+
+    let historyStatement = "";
+    let number = "";
+    let answer = null;
+    let operator = "";
+
+    /*-------------------------EVENT LISTENERS--------------------------------*/   
+    
+    clear.addEventListener("click", clearEvent);    
+    clearNumber.addEventListener("click", clearNumberEvent);    
+    back.addEventListener("click", backEvent);    
+    equals.addEventListener("click", displayAnswer);    
+    neg.addEventListener("click",negativeNumber);    
+    operators.forEach(n => n.addEventListener("click", storeOperator));    
+    numbers.forEach(n => n.addEventListener("click", formNumber));
+
+    /*-----------------------------FUNCTIONS----------------------------------*/
+
+    function storeOperator() {        
+        if (answer === null) 
+            answer = Number.parseFloat(number);        
+        else if (number) {
+            switch (operator) {
+                case "*": answer *= Number.parseFloat(number);
+                    break;
+                case "/": answer /= Number.parseFloat(number);
+                    break;
+                case "-": answer -= Number.parseFloat(number);
+                    break;
+                case "+": answer += Number.parseFloat(number);
+                    break;
+            }
+        }
+        operator = event.target.innerHTML;
+        result.innerText = operator;
+        historyStatement += `${number} ${operator}`;
+        number = "";
+    }
+
+    function formNumber(event) {
+        number += event.target.innerHTML;
+        result.innerText = number;
+    }
+
+    function negativeNumber(){
+        if(number.charAt(0)!='-')
+            number = `-${number}`;
+        else{
+            number = number.slice(1,number.length);
+        }
+        result.innerText = number;
+    }
+
+    function calculate() {const result = document.getElementById("result");}
+
+    function clearEvent() {
+        answer = null;
+        historyStatement = "";
+        number = "";
+        operator = "";
+        result.innerText ="";
+    }
+
+    function clearNumberEvent() {
+        number = "";
+        result.innerText = number;
+    }
+
+    function updateDisplayAnswer() {result.innerText = Number.parseFloat(answer);}
+
+    function backEvent() {
+        number = number.slice(0, number.length - 1);
+        result.innerText = number;
+    }
+
+    function displayAnswer() {
+        switch (operator) {
+            case "*": answer *= Number.parseFloat(number);
+                break;
+            case "/": answer /= Number.parseFloat(number);
+                break;
+            case "-": answer -= Number.parseFloat(number);
+                break;
+            case "+": answer += Number.parseFloat(number);
+                break;
+        }
+        if(answer!= null && !Number.isNaN(answer)){
+            historyStatement += ` ${number} = ${answer}`;
+            historyArray.push(historyStatement);
+            updateDisplayAnswer();
+        }
+
+        else{
+            result.innerText = "error";
+        }
+
+        displayHistory();        
+        historyStatement = "";
+        number = "";
+        operator = "";        
+        answer = null;
+    }
+
+    function displayHistory() {
+        const html = historyArray.map(n => `<li>${n}</li>`).join("");
+        historyElement.innerHTML = html;
+    }
+</script>
+</html>
